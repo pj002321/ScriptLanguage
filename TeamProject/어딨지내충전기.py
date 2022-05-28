@@ -1,15 +1,17 @@
+from glob import glob
 from msilib.schema import ListBox
+from textwrap import fill
 from tkinter import*
 from tkinter import font
-import tkinter.font as tkFont
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 import pprint
-
 import folium
 import webbrowser
+
 BooksDoc=None
 g_Tk = Tk()
 g_Tk.geometry("400x600+450+100")
-
 
 import requests
 
@@ -21,6 +23,9 @@ response = requests.get(url, params=params)
 
 pp = pprint.PrettyPrinter(indent=4)
 print(pp.pprint(response.content))
+senderAddr="tlsehdduq98@gmail.com"
+recipientAddr="tlsehdduq98@gmail.com"
+msg=MIMEMultipart('alternative')
 
 def event_for_list(event):
     selection = event.widget.curselection()
@@ -28,6 +33,29 @@ def event_for_list(event):
         index = selection[0]    
         data = event.widget.get(index)
         print(data)
+
+    
+def sendMail(fromAddr,toAddr,msg):
+    global senderAddr,recipientAddr
+    import smtplib # 실제 보내는 녀석
+    s=smtplib.SMTP("smtp.gmail.com",587)
+    s.starttls()
+
+    #앱 패스워드 이용
+    s.login('tlsehdduq98@gmail.com','idmw bebw lzem kxot')
+    s.sendmail(fromAddr,[toAddr],msg.as_string())
+    s.close()
+    
+    msg['Subject'] = '제목 : 파이썬으로 gmail 보내기'
+    msg['From'] = senderAddr
+    msg['To']=recipientAddr
+
+    htmlFD=open("logo.html",'rb')
+    HtmlPart=MIMEText(htmlFD.read(),'html',_charset='UTF-8')
+    htmlFD.close()
+    msg.attach(HtmlPart)
+
+
 
 def Pressed():
     # Create a Map with Folium and Leaflet.js (위도 경도 지정) 
@@ -86,6 +114,7 @@ def event_for_listbox(event):
         print(index)
 
 def InitScreen():
+    global senderAddr,recipientAddr,msg
     fontTitle = font.Font(g_Tk,size=18,weight='bold',family="Bahnschrift",slant="italic")
     fontNormal = font.Font(g_Tk,size=11,weight='bold')
 
@@ -102,17 +131,18 @@ def InitScreen():
     
     Label(frameTitle, font = fontTitle, text="[어딨지? 내 충전기]").pack(anchor="center", fill="both")
 
-    Button(frameCombo,font=fontNormal,text='도로명').pack(side='left',padx=10,fil='y')
+    Button(frameCombo,font=fontNormal,text='도로명').pack(side='left',padx=10,fill='y')
 
-    Button(frameCombo,font=fontNormal,text='충전소명').pack(side='left',padx=10,fil='y')
+    Button(frameCombo,font=fontNormal,text='충전소명').pack(side='left',padx=10,fill='y')
     
-    Button(frameCombo,font=fontNormal,text='충전기 타입').pack(side='right',padx=10,fil='y')
+    Button(frameCombo,font=fontNormal,text='충전기 타입').pack(side='right',padx=10,fill='y')
 
-    Button(frameCombo,font=fontNormal,text='지도상 위치',command=Pressed).pack(side='right',padx=10,fil='y')
+    Button(frameCombo,font=fontNormal,text='지도상 위치',command=Pressed).pack(side='right',padx=10,fill='y')
 
+    Button(frameEntry,font=fontNormal,text="이메일",command=sendMail(senderAddr,recipientAddr,msg)).pack(side="bottom",padx=10,expand=True,fill='both')
     
     resetButton = Button(frameReset,font=fontNormal,text='초기화')
-    resetButton.pack(side='bottom',padx=10,fil='y')
+    resetButton.pack(side='bottom',padx=10,fill='y')
     global InputLabel
     InputLabel = Entry(frameEntry,font=fontNormal,width=35,borderwidth=12,relief='ridge')
     InputLabel.pack(side="left",padx=15,expand=True)
