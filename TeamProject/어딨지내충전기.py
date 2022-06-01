@@ -40,28 +40,7 @@ def Pressed():
     webbrowser.open_new('osm.html')
 
 def SearchLibrary():
-    from xml.etree import ElementTree 
-    global listBox
-    listBox.delete(0,listBox.size()) 
-
-    with open('getChargerInfo.xml', 'rb') as f: 
-        strXml = f.read().decode('utf-8')
-    parseData = ElementTree.fromstring(strXml) 
-    elements = parseData.iter('row')
-
-    i = 1
-    for item in elements:
-        part_el = item.find('pageNo')
-
-        if InputLabel.get() not in part_el.text:
-            continue
-
-        _text = '['+str(i)+']'+ \
-            getStr(item.find('numOfRows').text)+ \
-            ':' + getStr(item.find('period').text)+\
-            ':' + getStr(item.find('zcode').text)+\
-        listBox.insert(i-1,_text)
-        i=i+1
+    pass
 
 
 def onSearch(): 
