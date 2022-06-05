@@ -78,46 +78,8 @@ def Pressed():
     map_osm.save('osm.html')
     webbrowser.open_new('osm.html')
 
-<<<<<<< HEAD
 def SearchLibrary():
     pass
-=======
-def connectOpenAPIServer(server):   
-    conn = HTTPSConnection(server) 
-    conn.set_debuglevel(1)
-    return conn
-
-
-def userURIBuilder(uri, **user): 
-    str = uri + "?"
-    for key in user.keys(): 
-        str += key + "=" + user[key] + "&"
-    return str
-
-def getsellAptInfo():
-    url = 'http://apis.data.go.kr/B552584/EvCharger?serviceKey=lG82c%2B9oYvMU4QwfaSNiAMTU%2BacChjPPigBb6e%2FmvQXhkxwAcoxyi4BPi1SvjmmWQSUz41ofz%2Bhm6ei5vwvjYg%3D%3D&'
-    params ={'pageNo' : '1', 'numOfRows' : '10', 'period' : '5', 'zcode' : '11' }
-
-    response = requests.get(url, params=params)
-    #print(response.content)
-
-    global listBox
-    listBox.delete(0,listBox.size()) 
-
-    parseData = ElementTree.fromstring(response.content) 
-
-    i = 1
-    for item in parseData.findall('item'):
-        #part_el = item.find('items')
-        
-        _text = '['+str(i)+']'+ \
-            getStr(item.find('statNm').text)+ \
-            ':' + getStr(item.find('addr').text)+ \
-            ':' + getStr(item.find('useTime').text)
-        listBox.insert(i-1,_text)
-        print(_text)
-        i=i+1
->>>>>>> b77169e7db604df67f03c977e4807f3cf2e4b588
 
 
 
