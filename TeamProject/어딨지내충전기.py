@@ -1,4 +1,5 @@
 
+from email.utils import parsedate
 from msilib.schema import ListBox
 from textwrap import fill
 from tkinter import*
@@ -6,6 +7,8 @@ from tkinter import font
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import pprint
+import urllib
+from urllib import response
 import folium
 import webbrowser
 from codecs import utf_16_be_encode
@@ -78,12 +81,10 @@ def Pressed():
     map_osm.save('osm.html')
     webbrowser.open_new('osm.html')
 
-<<<<<<< HEAD
-def SearchLibrary():
-    pass
-=======
+
+
 def connectOpenAPIServer(server):   
-    conn = HTTPSConnection(server) 
+    conn = HTTPSConnection("apis.data.go.kr") 
     conn.set_debuglevel(1)
     return conn
 
@@ -95,30 +96,25 @@ def userURIBuilder(uri, **user):
     return str
 
 def getsellAptInfo():
-    url = 'http://apis.data.go.kr/B552584/EvCharger?serviceKey=lG82c%2B9oYvMU4QwfaSNiAMTU%2BacChjPPigBb6e%2FmvQXhkxwAcoxyi4BPi1SvjmmWQSUz41ofz%2Bhm6ei5vwvjYg%3D%3D&'
-    params ={'pageNo' : '1', 'numOfRows' : '10', 'period' : '5', 'zcode' : '11' }
+    conn = HTTPSConnection("apis.data.go.kr") 
+    hangle_utf8=urllib.parse.quote("울산광역시")
+    conn.request("GET","/B553530/TRANSPORTATION/ELECTRIC_CHARGING?serviceKey=lG82c%2B9oYvMU4QwfaSNiAMTU%2BacChjPPigBb6e%2FmvQXhkxwAcoxyi4BPi1SvjmmWQSUz41ofz%2Bhm6ei5vwvjYg%3D%3D&returnType=xml&pageNo=1&numOfRows=10&period=5&zcode=11"+hangle_utf8+"ver=1.0")
+    parseData = conn.getresponse()
+    print(parseData.status)
+    print(parseData.length)
 
-    response = requests.get(url, params=params)
-    #print(response.content)
-
-    global listBox
-    listBox.delete(0,listBox.size()) 
-
-    parseData = ElementTree.fromstring(response.content) 
-
-    i = 1
-    for item in parseData.findall('item'):
-        #part_el = item.find('items')
-        
-        _text = '['+str(i)+']'+ \
-            getStr(item.find('statNm').text)+ \
-            ':' + getStr(item.find('addr').text)+ \
-            ':' + getStr(item.find('useTime').text)
-        listBox.insert(i-1,_text)
-        print(_text)
-        i=i+1
->>>>>>> b77169e7db604df67f03c977e4807f3cf2e4b588
-
+    if parseData.status == 200:
+            parseData.read().decode('utf-8')
+            print("정상호출")
+    else:
+        print("읽지 못함")
+            
+    #         parseData = parseString(TempDoc)
+    #         response = parseData.childNodes
+    #         body = response[0].childNodes
+    #         items = body[3].childNodes
+    #         item = items[1].childNodes
+    #         for temp in item:    
 
 
 def getStr(s):
@@ -165,7 +161,7 @@ def InitScreen():
     InputLabel = Entry(frameEntry,font=fontNormal,width=35,borderwidth=12,relief='ridge')
     InputLabel.pack(side="left",padx=15,expand=True)
 
-    SearchButton = Button(frameEntry,font=fontNormal,text="검색",command=getsellAptInfo)
+    SearchButton = Button(frameEntry,font=fontNormal,text="검색")
     SearchButton.pack(side="right",padx=10,expand=True,fill='y')
 
     global listBox
