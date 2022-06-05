@@ -83,10 +83,10 @@ def Pressed():
 
 
 
-def connectOpenAPIServer(server):   
-    conn = HTTPSConnection("apis.data.go.kr") 
-    conn.set_debuglevel(1)
-    return conn
+# def connectOpenAPIServer(server):   
+#     conn = HTTPSConnection("apis.data.go.kr") 
+#     conn.set_debuglevel(1)
+#     return conn
 
 
 def userURIBuilder(uri, **user): 
@@ -100,8 +100,8 @@ def getsellAptInfo():
     hangle_utf8=urllib.parse.quote("울산광역시")
     conn.request("GET","/B553530/TRANSPORTATION/ELECTRIC_CHARGING?serviceKey=lG82c%2B9oYvMU4QwfaSNiAMTU%2BacChjPPigBb6e%2FmvQXhkxwAcoxyi4BPi1SvjmmWQSUz41ofz%2Bhm6ei5vwvjYg%3D%3D&returnType=xml&pageNo=1&numOfRows=10&period=5&zcode=11"+hangle_utf8+"ver=1.0")
     parseData = conn.getresponse()
-    print(parseData.status)
-    print(parseData.length)
+    print(parseData.status) # API 호출 현재 상태
+    print(parseData.length) # xml 용량 (울산광역시 해당)
 
     if parseData.status == 200:
             parseData.read().decode('utf-8')
