@@ -1,4 +1,5 @@
 
+from email.utils import parsedate
 from msilib.schema import ListBox
 from textwrap import fill
 from tkinter import*
@@ -6,6 +7,8 @@ from tkinter import font
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import pprint
+import urllib
+from urllib import response
 import folium
 import webbrowser
 from codecs import utf_16_be_encode
@@ -78,9 +81,40 @@ def Pressed():
     map_osm.save('osm.html')
     webbrowser.open_new('osm.html')
 
-def SearchLibrary():
-    pass
 
+
+# def connectOpenAPIServer(server):   
+#     conn = HTTPSConnection("apis.data.go.kr") 
+#     conn.set_debuglevel(1)
+#     return conn
+
+
+def userURIBuilder(uri, **user): 
+    str = uri + "?"
+    for key in user.keys(): 
+        str += key + "=" + user[key] + "&"
+    return str
+
+def getsellAptInfo():
+    conn = HTTPSConnection("apis.data.go.kr") 
+    hangle_utf8=urllib.parse.quote("울산광역시")
+    conn.request("GET","/B553530/TRANSPORTATION/ELECTRIC_CHARGING?serviceKey=lG82c%2B9oYvMU4QwfaSNiAMTU%2BacChjPPigBb6e%2FmvQXhkxwAcoxyi4BPi1SvjmmWQSUz41ofz%2Bhm6ei5vwvjYg%3D%3D&returnType=xml&pageNo=1&numOfRows=10&period=5&zcode=11"+hangle_utf8+"ver=1.0")
+    parseData = conn.getresponse()
+    print(parseData.status) # API 호출 현재 상태
+    print(parseData.length) # xml 용량 (울산광역시 해당)
+
+    if parseData.status == 200:
+            parseData.read().decode('utf-8')
+            print("정상호출")
+    else:
+        print("읽지 못함")
+            
+    #         parseData = parseString(TempDoc)
+    #         response = parseData.childNodes
+    #         body = response[0].childNodes
+    #         items = body[3].childNodes
+    #         item = items[1].childNodes
+    #         for temp in item:    
 
 
 def getStr(s):
@@ -127,7 +161,7 @@ def InitScreen():
     InputLabel = Entry(frameEntry,font=fontNormal,width=35,borderwidth=12,relief='ridge')
     InputLabel.pack(side="left",padx=15,expand=True)
 
-    SearchButton = Button(frameEntry,font=fontNormal,text="검색",command=getsellAptInfo)
+    SearchButton = Button(frameEntry,font=fontNormal,text="검색")
     SearchButton.pack(side="right",padx=10,expand=True,fill='y')
 
     global listBox
