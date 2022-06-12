@@ -29,11 +29,7 @@ class Configuration:
         elif (row == 14):
             return Configuration.sumDie(dicelist)
 
-    def scoreUpper(d, num):  # 정적 메소드: 객체생성 없이 사용 가능
-
-        # Upper Section 구성 (Ones, Twos, Threes, ...)에 대해 주사위 점수를 매 깁니다. 예를 들어,
-        # num이 1이면 "Ones"구성의 주사위 점수를 반환합니다.
-
+    def scoreUpper(d, num): 
         return d.count(num)*num
 
     def scoreThreeOfAKind(d):
@@ -58,15 +54,11 @@ class Configuration:
         return False
 
     def scoreSmallStraight(d):
-        # 1 2 3 4 혹은 2 3 4 5 혹은 3 4 5 6 검사
-        # 1 2 2 3 4, 1 2 3 4 6, 1 3 4 5 6, 2 3 4 4 5
         if (1 in d and 2 in d and 3 in d and 4 in d) or (2 in d and 3 in d and 4 in d and 5 in d) or (3 in d and 4 in d and 5 in d and 6 in d):
             return 30
         return False
 
     def scoreLargeStraight(d):
-
-
         if (1 in d and 2 in d and 3 in d and 4 in d and 5 in d) or (2 in d and 3 in d and 4 in d and 5 in d and 6 in d) :
             return 40
         return False
