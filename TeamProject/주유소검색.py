@@ -2,6 +2,7 @@ from ast import Index
 from http.client import HTTPSConnection
 from tkinter import *
 from tkinter import font
+from unicodedata import name
 from PIL import Image, ImageTk
 import datetime
 from email.mime.base import MIMEBase
@@ -25,7 +26,7 @@ key = 'lG82c%2B9oYvMU4QwfaSNiAMTU%2BacChjPPigBb6e%2FmvQXhkxwAcoxyi4BPi1SvjmmWQSU
 baseurl = 'http://apis.data.go.kr/3510500/gas_station/getList?type=xml&pageNo=1&numOfRows=10&serviceKey='+key
 DOC = []
 data2=[]
-
+mylist=[]
 def event_for_listbox(event): 
     selection = event.widget.curselection()
     if selection:
@@ -87,26 +88,16 @@ class MainGUI():
         # title 부분
         self.MainText = Label(self.frameTitle, font = self.fontTitle, text=" 주유소 검색 ")
         self.MainText.pack(anchor="center", fill="both")
-        self.res_list=[]
 
-        # global SearchListBox 
-        # self.LBScrollbar = Scrollbar(self.frameCombo)
-        # SearchListBox = Listbox(self.frameCombo,font=self.fontNormal, width=10, height=1, borderwidth=7, relief='solid', yscrollcommand=LBScrollbar.set) 
-        # slist = ["도로명","전화번호","사용가능 여부"]
-        # for i, s in enumerate(slist): 
-        #     SearchListBox.insert(i, s)
-        # SearchListBox.pack(side='left', padx=10, expand=True,fill="both")
-        # self.LBScrollbar.pack(side="left")
-        # self.LBScrollbar.config(command=SearchListBox.yview) 
-       
-        
-        # global InputEntry
-        # TempFont = font.Font(g_Tk, size=12, weight='bold', family = 'Consolas')
-        # InputEntry = Entry(g_Tk, font = TempFont, width = 15, borderwidth = 12, relief = 'solid')
-        # InputEntry.pack()
-        # InputEntry.place(x=13, y=450)
-
-        
+        self.LBScrollbar2 = Scrollbar(self.frameList)
+        self.SearchListBox = Listbox(self.frameList,font=self.fontNormal, width=10, height=1, borderwidth=7, relief='solid',yscrollcommand=self.LBScrollbar2.set) 
+        slist = ['경인오일티엠(주)', '동원주유소', '인하주유소', '명보주유소', 'KH에너지(주)직영 청도1주유소', '제물포하이웨이주유소', '황금주유소', '다솜주유소', '통일주유소', '큰나무주유소']
+        for i, s in enumerate(slist): 
+            self.SearchListBox.insert(i, s)
+        self.SearchListBox.pack(side='left', padx=10, expand=True,fill="both")
+        self.LBScrollbar.pack(side="left")
+        self.LBScrollbar.config(command=self.SearchListBox.yview) 
+          
         self.GMailButton = Button(self.frameCombo,command=self.SendMail,image=photo,bg='#ffffff')
         self.GMailButton.pack(side='left',padx=10,expand=True)
         self.MapButton = Button(self.frameCombo ,command=self.Pressed,image=mapphoto,bg='#ffffff')
@@ -114,28 +105,30 @@ class MainGUI():
 
 
         global InputLabel
-        InputLabel = Entry(self.frameEntry, font = self.fontNormal,width = 55, borderwidth = 5, relief = 'solid')
+        InputLabel = Entry(self.frameEntry, font = self.fontNormal,width = 75, borderwidth = 5, relief = 'solid')
         InputLabel.pack(side="left", padx=10, expand=True)
         SearchButton = Button(self.frameEntry, font = self.fontNormal,text="검색", command=self.getData)           #############
         SearchButton.pack(side="right", padx=10, expand=True, fill='y')
 
         global listBox 
         global res_list
+        global mylist
         LBScrollbar = Scrollbar(self.frameList)
         listBox = Listbox(self.frameList, selectmode='extended',font=self.fontNormal,height=15,borderwidth=12, relief='groove', yscrollcommand=LBScrollbar.set)
-        for t in self.res_list:
-            listBox.insert(END,'주유소이름 : ' +t['bsn_nm'] , '도로명 : '+ t['road_nm_addr'] , \
-            '위도 : '+ t['lat'] , '주유소 브랜드 : ' +t['cat'] , '번호 : '+t['tel_no'], '사용가능 : '+ t['self_yn'])
+        for t in mylist:
+            listBox.insert(END,t)
         listBox.insert(END,' ================================================================================')
-        listBox.insert(END,' 주유소이름 : ' + self.res_list['bsn_nm'])
+        #listBox.insert(END,' 주유소이름 : ' + res_list['bsn_nm'])
 
         #listBox.bind('<<ListboxSelect>>', clicked_listbox)
-        listBox.pack(side='left', anchor='s', expand=True, fill="x")
+        listBox.pack(side='left', anchor='n', expand=True, fill="x")
         LBScrollbar.pack(side="right",fill='y')
         LBScrollbar.config(command=listBox.yview)
 
     def getData(self): 
-        self.res_list=[]
+        global res_list
+        global listBox
+        global mylist
         url = baseurl
         res_body = urlopen(url).read() 
         strXml = res_body.decode('utf-8')
@@ -150,28 +143,17 @@ class MainGUI():
             brand = item.find("cat").text 
             tel = item.find("tel_no").text
             yesorno = item.find("self_yn").text
-             
+            mylist.append(item.find("bsn_nm").text)
             row = Index + '/' + '주유소이름 : ' +name + '/' +'도로명 : '+ addr + ', ' \
-                + '위도 : '+ location + ' ' + '주유소 브랜드 : '+brand + ' [' \
-                + '번호 : '+ tel+' ] ,' +'사용가능 : '+ yesorno
-            self.res_list.append(row)
+                + '위도 : '+ location + ' ' + '주유소 브랜드 : '+brand + ' [' + '번호 : '+ tel+' ] ,' +'사용가능 : '+ yesorno
+            listBox.insert(END,row)  
+            res_list.append(row)
+        
+           
     
-        print(self.res_list)
-        return self.res_list
-
-
-                
-
-    # def onSearch():
-    #     global res_list
-    #     frameList = Frame(g_Tk, padx=10, pady=10, bg='#ffffff')
-    #     LBScrollbar = Scrollbar(frameList)
-    #     frameCombo = Frame(g_Tk, pady=10, bg='#000000')
-    #     frameCombo.pack(side="top", fill="x")
-    #     fontNormal = font.Font(g_Tk, size=12, weight='bold')
-    #     Listbox(frameCombo,font=fontNormal, activestyle='none', width=10, height=1, borderwidth=7, relief='solid', yscrollcommand=LBScrollbar.set) 
-    #     for s in parseString.res_list:
-    #         Listbox.insert('이름' + s['bsn_nm'])
+        #print(res_list)
+        print(mylist)
+        return mylist
 
 
 
