@@ -21,6 +21,8 @@ import mysmtplib
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText 
 
+
+
 g_TK = Tk()
 g_TK.title("주유소 찾기")
 g_TK.geometry("550x600")
@@ -32,7 +34,16 @@ DustInfo = []
 myimagelabel = []
 now = datetime.datetime.now()
 
+def event_for_listbox(self,event):
+    selection = event.widget.curselection()
+    if selection:
+        index = selection[0]
+        data = event.widget.get(index)
+        print(data)
+
+
 class MainGUI:
+
     def InitSearch(self):
         global SearchListBox
 
@@ -48,14 +59,34 @@ class MainGUI:
         SearchListBox = Listbox(g_TK, font=myFont, activestyle='none',
                                 width=10, height=1, borderwidth=12, relief='ridge',
                                 yscrollcommand=ListBoxScrollBar.set)
-        SearchListBox.insert(1, "시흥시")
+        SearchListBox.insert(1, "이름")
+
         SearchListBox.pack()
         SearchListBox.place(x=30, y=70)
+        
+
+    def InitSearcButton(self):
+        myFont = font.Font(g_TK,size=10,weight='bold')
+        SearchButton = Button(g_TK,font=myFont,text="Search",
+        command=self.SearchButtonAction)
+        SearchButton.pack()
+        SearchButton.place(x=170, y=80)
+
+    def SearchButtonAction(self):
+        myListBox = SearchListBox.curselection()[0]
+        if myListBox == 0 :
+            self.searchMichuhole()
+
+    def searchMichuhole(self):
+        pass
+
 
     def __init__(self):
         self.canvas = Canvas(g_TK, bg='azure', width='550', height='600')
         self.canvas.pack()
         self.canvas.place(x=0,y=0)
+        self.InitSearch()
+        self.InitSearcButton()
         
         g_TK.mainloop()
 
