@@ -6,7 +6,7 @@ import traceback
 from xml.etree import ElementTree
 from xml.dom.minidom import parseString
 key = 'lG82c%2B9oYvMU4QwfaSNiAMTU%2BacChjPPigBb6e%2FmvQXhkxwAcoxyi4BPi1SvjmmWQSUz41ofz%2Bhm6ei5vwvjYg%3D%3D'
-TOKEN = '5561513604:AAGmM9tO9K2Xsyt-nBJMfOgGEXAB40fUjk4'
+TOKEN = '5583123871:AAETLHE2voiBMydob3opuTzGUYCi93cAbDc'
 MAX_MSG_LENGTH = 300
 baseurl = 'http://apis.data.go.kr/3510500/gas_station/getList?type=xml&pageNo=1&numOfRows=10&serviceKey='+key
 bot = telepot.Bot(TOKEN)
@@ -20,17 +20,18 @@ def getData():
     tree = ElementTree.fromstring(strXml)
     items = tree.iter("item") # return list type
     for item in items: 
-        amount = item.find("no").text.strip()
-        build = item.find("bsn_nm").text
-        y = item.find("road_nm_addr").text
-        dong = item.find("lat").text 
-        apt = item.find("cat").text 
-        m = item.find("tel_no").text
-        d = item.find("self_yn").text 
-        row = y + '/' + m + '/' + d + ', ' + dong + ' ' + apt + '(' \
-            + build+') ,' + amount
-        res_list.append(row)
-        sendMessage('5572194409',row)
+            Index = item.find("no").text.strip()
+            name = item.find("bsn_nm").text
+            addr = item.find("road_nm_addr").text
+            location = item.find("lat").text 
+            brand = item.find("cat").text 
+            tel = item.find("tel_no").text
+            yesorno = item.find("self_yn").text
+           
+            row = Index + '/' + '주유소이름 : ' +name + '/' +'도로명 : '+ addr + ', ' \
+                + '위도 : '+ location + ' ' + '주유소 브랜드 : '+brand + ' [' + '번호 : '+ tel+' ] ,' +'사용가능 : '+ yesorno
+            res_list.append(row)
+            sendMessage('5572194409',row)
 
     print(res_list)
         

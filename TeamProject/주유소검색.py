@@ -13,20 +13,28 @@ from xml.dom.minidom import parse, parseString
 import folium
 import webbrowser
 import mysmtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 import parsing
+import gmail
+import tkintermapview
 
 list=[]
+datax=[]
+datay=[]
 g_Tk = Tk()
-g_Tk.geometry("800x600") 
+g_Tk.geometry("1000x600") 
 res_list = []
 photo = ImageTk.PhotoImage(file="Mail.png")
 mapphoto = ImageTk.PhotoImage(file="Map.png")
 now = datetime.datetime.now()
 key = 'lG82c%2B9oYvMU4QwfaSNiAMTU%2BacChjPPigBb6e%2FmvQXhkxwAcoxyi4BPi1SvjmmWQSUz41ofz%2Bhm6ei5vwvjYg%3D%3D'
 baseurl = 'http://apis.data.go.kr/3510500/gas_station/getList?type=xml&pageNo=1&numOfRows=10&serviceKey='+key
+
 DOC = []
 data2=[]
 mylist=[]
+str = ""
 def event_for_listbox(event): 
     selection = event.widget.curselection()
     if selection:
@@ -43,6 +51,10 @@ def clicked_listbox(event):  # 리스트 선택 시 내용 출력
         print(data2)
     print('클릭')
 
+
+popup = inputEmail = btnEmail = None 
+addrEmail = None
+
 class MainGUI():
     def __init__(self):
         self.frameList = Frame(g_Tk, padx=10, pady=10, bg='#ffffff')
@@ -53,24 +65,47 @@ class MainGUI():
         self.listbox=Listbox(self.frameCombo,font=self.fontNormal, activestyle='none', width=10, height=1, borderwidth=7, relief='solid', yscrollcommand=self.LBScrollbar.set)
         self.InitScreen()
 
-    def SendMail(fromAddr,toAddr,msg):
-        # s.starttls()
+    def onEmailInput(self): 
+        global addrEmail 
+        global resultEmail
+        global str
+        global popup, data2
+        
+            
+        resultEmail = "t55300354@gmail.com"
+        addrEmail = inputEmail.get()
+        str = MIMEText("메일 전송")
+        
+        gmail.sendMail(addrEmail,resultEmail,str)
 
-        # #앱 패스워드 이용
-        # s.login('tlsehdduq98@gmail.com','idmw bebw lzem kxot')
-        # s.login('t55300354@gmail.com','kqvn jvje wfsk saau')
-        # s.sendmail(fromAddr,[toAddr],msg.as_string())
-        # s.close()
+        popup.destroy() # popup 내리기
+    
+    def onEmailPopup(self): 
+        global g_Tk, addrEmail, popup
+        addrEmail = None 
+        
+        popup = Toplevel(g_Tk)
+        popup.geometry("300x150")
+        popup.title("받을 이메일 주소 입력")
+        
+        global inputEmail, btnEmail
+        inputEmail = Entry(popup, width = 200,)
+        inputEmail.pack(fill='x', padx=10, expand=True)
+        btnEmail = Button(popup, text="확인", command=self.onEmailInput)
+        btnEmail.pack(anchor="s", padx=10, pady=10)
+
+    def onMapPopup(self):
         pass
+   
 
     def Pressed(self):
-        # # Create a Map with Folium and Leaflet.js (위도 경도 지정) 
-        # map_osm = folium.Map(location=[37.3402849,126.7313189], zoom_start=13)
-        # # 마커 지정
-        # folium.Marker([37.3402849,126.7313189],popup='한국공학대학교').add_to(map_osm)
-        # # html 파일로 저장
-        # map_osm.save('osm.html')
-        # webbrowser.open_new('osm.html')
+        # Create a Map with Folium and Leaflet.js (위도 경도 지정) 
+        map_osm = folium.Map(location=[37.3402849,126.7313189], zoom_start=13)
+        # 마커 지정
+        folium.Marker([37.3402849,126.7313189],popup='한국공학대학교').add_to(map_osm)
+        # html 파일로 저장
+        map_osm.save('osm.html')
+        webbrowser.open_new('osm.html')
         pass
 
     def InitScreen(self): 
@@ -98,8 +133,9 @@ class MainGUI():
         self.LBScrollbar.pack(side="left")
         self.LBScrollbar.config(command=self.SearchListBox.yview) 
           
-        self.GMailButton = Button(self.frameCombo,command=self.SendMail,image=photo,bg='#ffffff')
+        self.GMailButton = Button(self.frameCombo,command=self.onEmailPopup,image=photo,bg='#ffff00')
         self.GMailButton.pack(side='left',padx=10,expand=True)
+        
         self.MapButton = Button(self.frameCombo ,command=self.Pressed,image=mapphoto,bg='#ffffff')
         self.MapButton.pack(side='left',padx=10,expand=True)
 
@@ -113,13 +149,13 @@ class MainGUI():
         global listBox 
         global res_list
         global mylist
+        
         LBScrollbar = Scrollbar(self.frameList)
         listBox = Listbox(self.frameList, selectmode='extended',font=self.fontNormal,height=15,borderwidth=12, relief='groove', yscrollcommand=LBScrollbar.set)
         for t in mylist:
             listBox.insert(END,t)
         listBox.insert(END,' ================================================================================')
-        #listBox.insert(END,' 주유소이름 : ' + res_list['bsn_nm'])
-
+    
         #listBox.bind('<<ListboxSelect>>', clicked_listbox)
         listBox.pack(side='left', anchor='n', expand=True, fill="x")
         LBScrollbar.pack(side="right",fill='y')
@@ -128,7 +164,7 @@ class MainGUI():
     def getData(self): 
         global res_list
         global listBox
-        global mylist
+        global mylist 
         url = baseurl
         res_body = urlopen(url).read() 
         strXml = res_body.decode('utf-8')
@@ -139,15 +175,18 @@ class MainGUI():
             Index = item.find("no").text.strip()
             name = item.find("bsn_nm").text
             addr = item.find("road_nm_addr").text
+            global str
+            str = addr
             location = item.find("lat").text 
             brand = item.find("cat").text 
             tel = item.find("tel_no").text
             yesorno = item.find("self_yn").text
-            mylist.append(item.find("bsn_nm").text)
+            # mylist.append(item.find("bsn_nm").text)
             row = Index + '/' + '주유소이름 : ' +name + '/' +'도로명 : '+ addr + ', ' \
-                + '위도 : '+ location + ' ' + '주유소 브랜드 : '+brand + ' [' + '번호 : '+ tel+' ] ,' +'사용가능 : '+ yesorno
+                + '위도 : '+ location + ' ' + '\n''주유소 브랜드 : '+brand + ' [' + '번호 : '+ tel+' ] ,' +'사용가능 : '+ yesorno
             listBox.insert(END,row)  
             res_list.append(row)
+        mylist.append(res_list)
         
            
     
