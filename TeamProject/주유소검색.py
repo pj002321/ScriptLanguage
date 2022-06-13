@@ -15,9 +15,15 @@ import webbrowser
 import mysmtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
 import parsing
 import gmail
 import tkintermapview
+
+import tkintermapview
+import parsing
+import gmail_send
+
 
 list=[]
 datax=[]
@@ -25,8 +31,8 @@ datay=[]
 g_Tk = Tk()
 g_Tk.geometry("1000x600") 
 res_list = []
-photo = ImageTk.PhotoImage(file="Mail.png")
-mapphoto = ImageTk.PhotoImage(file="Map.png")
+photo = ImageTk.PhotoImage(file='Mail.png')
+mapphoto = ImageTk.PhotoImage(file='Map.png')
 now = datetime.datetime.now()
 key = 'lG82c%2B9oYvMU4QwfaSNiAMTU%2BacChjPPigBb6e%2FmvQXhkxwAcoxyi4BPi1SvjmmWQSUz41ofz%2Bhm6ei5vwvjYg%3D%3D'
 baseurl = 'http://apis.data.go.kr/3510500/gas_station/getList?type=xml&pageNo=1&numOfRows=10&serviceKey='+key
@@ -71,7 +77,6 @@ class MainGUI():
         global str
         global popup, data2
         
-            
         resultEmail = "t55300354@gmail.com"
         addrEmail = inputEmail.get()
         str = MIMEText("메일 전송")
@@ -100,9 +105,9 @@ class MainGUI():
 
     def Pressed(self):
         # Create a Map with Folium and Leaflet.js (위도 경도 지정) 
-        map_osm = folium.Map(location=[37.3402849,126.7313189], zoom_start=13)
+        map_osm = folium.Map(location=[37.48129491,126.6575332], zoom_start=13)
         # 마커 지정
-        folium.Marker([37.3402849,126.7313189],popup='한국공학대학교').add_to(map_osm)
+        folium.Marker([37.48129491,126.6575332],popup='현대오일뱅크').add_to(map_osm)
         # html 파일로 저장
         map_osm.save('osm.html')
         webbrowser.open_new('osm.html')
@@ -133,6 +138,7 @@ class MainGUI():
         self.LBScrollbar.pack(side="left")
         self.LBScrollbar.config(command=self.SearchListBox.yview) 
           
+
         self.GMailButton = Button(self.frameCombo,command=self.onEmailPopup,image=photo,bg='#ffff00')
         self.GMailButton.pack(side='left',padx=10,expand=True)
         
