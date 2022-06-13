@@ -13,20 +13,25 @@ from xml.dom.minidom import parse, parseString
 import folium
 import webbrowser
 import mysmtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import tkintermapview
 import parsing
+import gmail_send
 
 list=[]
 g_Tk = Tk()
 g_Tk.geometry("800x600") 
 res_list = []
-photo = ImageTk.PhotoImage(file="Mail.png")
-mapphoto = ImageTk.PhotoImage(file="Map.png")
+# photo = ImageTk.PhotoImage(file="Mail.png")
+# mapphoto = ImageTk.PhotoImage(file="Map.png")
 now = datetime.datetime.now()
 key = 'lG82c%2B9oYvMU4QwfaSNiAMTU%2BacChjPPigBb6e%2FmvQXhkxwAcoxyi4BPi1SvjmmWQSUz41ofz%2Bhm6ei5vwvjYg%3D%3D'
 baseurl = 'http://apis.data.go.kr/3510500/gas_station/getList?type=xml&pageNo=1&numOfRows=10&serviceKey='+key
 DOC = []
 data2=[]
 mylist=[]
+str = ""
 def event_for_listbox(event): 
     selection = event.widget.curselection()
     if selection:
@@ -43,6 +48,10 @@ def clicked_listbox(event):  # 리스트 선택 시 내용 출력
         print(data2)
     print('클릭')
 
+
+popup = inputEmail = btnEmail = None 
+addrEmail = None
+
 class MainGUI():
     def __init__(self):
         self.frameList = Frame(g_Tk, padx=10, pady=10, bg='#ffffff')
@@ -53,15 +62,51 @@ class MainGUI():
         self.listbox=Listbox(self.frameCombo,font=self.fontNormal, activestyle='none', width=10, height=1, borderwidth=7, relief='solid', yscrollcommand=self.LBScrollbar.set)
         self.InitScreen()
 
-    def SendMail(fromAddr,toAddr,msg):
-        # s.starttls()
+    def onEmailInput(self): 
+        global addrEmail 
+        global resultEmail
+        global str
+        global popup, data2
+        resultEmail = "tlsehdduq98@gmail.com"
+        addrEmail = inputEmail.get()
+        str = MIMEText("2018180024신동엽")
+        
+        gmail_send.sendMail(addrEmail,resultEmail,str)
 
-        # #앱 패스워드 이용
-        # s.login('tlsehdduq98@gmail.com','idmw bebw lzem kxot')
-        # s.login('t55300354@gmail.com','kqvn jvje wfsk saau')
-        # s.sendmail(fromAddr,[toAddr],msg.as_string())
-        # s.close()
-        pass
+        popup.destroy() # popup 내리기
+    
+    def onEmailPopup(self): 
+        global g_Tk, addrEmail, popup
+        addrEmail = None 
+        
+        popup = Toplevel(g_Tk)
+        popup.geometry("300x150")
+        popup.title("받을 이메일 주소 입력")
+        
+        global inputEmail, btnEmail
+        inputEmail = Entry(popup, width = 200,)
+        inputEmail.pack(fill='x', padx=10, expand=True)
+        btnEmail = Button(popup, text="확인", command=self.onEmailInput)
+        btnEmail.pack(anchor="s", padx=10, pady=10)
+
+    def onMapPopup(self):
+        global g_Tk, data2
+        
+        for s in parsing.mylist:
+            if s['TMP01'] == data2:
+                popup = Toplevel(g_Tk)  # popup 띄우기
+                popup.geometry(f"{800}x{600}")
+                popup.title("map.py")
+                map_widget = tkintermapview.TkinterMapView(popup, width=800, height=500, corner_radius=0)
+                map_widget.pack()
+
+                print(s['REFINE_WGS84_LOGT'], s['REFINE_WGS84_LAT'])
+                marker_1 = map_widget.set_address(s['REFINE_ROADNM_ADDR'], marker=True)
+
+                print(marker_1.position, marker_1.text)
+                marker_1.set_text(s['TMP01'])
+                map_widget.set_zoom(15)
+   
 
     def Pressed(self):
         # # Create a Map with Folium and Leaflet.js (위도 경도 지정) 
@@ -98,9 +143,10 @@ class MainGUI():
         self.LBScrollbar.pack(side="left")
         self.LBScrollbar.config(command=self.SearchListBox.yview) 
           
-        self.GMailButton = Button(self.frameCombo,command=self.SendMail,image=photo,bg='#ffffff')
+        self.GMailButton = Button(self.frameCombo,command=self.onEmailPopup,bg='#ffff00')
         self.GMailButton.pack(side='left',padx=10,expand=True)
-        self.MapButton = Button(self.frameCombo ,command=self.Pressed,image=mapphoto,bg='#ffffff')
+        
+        self.MapButton = Button(self.frameCombo ,command=self.onMapPopup,bg='#ffffff')
         self.MapButton.pack(side='left',padx=10,expand=True)
 
 
@@ -128,7 +174,7 @@ class MainGUI():
     def getData(self): 
         global res_list
         global listBox
-        global mylist
+        global mylist 
         url = baseurl
         res_body = urlopen(url).read() 
         strXml = res_body.decode('utf-8')
@@ -139,6 +185,8 @@ class MainGUI():
             Index = item.find("no").text.strip()
             name = item.find("bsn_nm").text
             addr = item.find("road_nm_addr").text
+            global str
+            str = addr
             location = item.find("lat").text 
             brand = item.find("cat").text 
             tel = item.find("tel_no").text
